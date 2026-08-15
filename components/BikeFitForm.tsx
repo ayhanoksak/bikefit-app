@@ -1,4 +1,20 @@
-const handleSubmit = async (e: React.FormEvent) => {
+'use client';
+
+import React, { useState } from 'react'; // useState import edildiğinden emin ol
+
+export default function BikeFitForm() {
+  // Eksik olan state tanımlamalarını buraya ekliyoruz:
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<any>(null);
+  const [data, setData] = useState({
+    // Form girdilerinin tutulduğu alan (boy, iç bacak boyu vb. burada yer almalı)
+    boy: '',
+    icBacak: '',
+    govde: '',
+    kol: '',
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
@@ -22,7 +38,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       if (res.ok && resData.success) {
         setResult(resData.results);
       } else {
-        // Hata durumunda sonuçları kesinlikle null yapıyoruz ki hesaplama gösterilmesin
         setResult(null);
         alert(`Hata (${res.status}): ` + (resData.error || 'İşlem başarısız. Lütfen giriş yapın.'));
       }
@@ -34,3 +49,10 @@ const handleSubmit = async (e: React.FormEvent) => {
       setLoading(false);
     }
   };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* Form inputları ve arayüz elemanları burada yer alacak */}
+    </form>
+  );
+}
