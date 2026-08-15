@@ -1,0 +1,30 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String      @id @default(cuid())
+  email             String      @unique
+  password          String
+  isVerified        Boolean     @default(false)
+  verificationToken String?     @unique
+  createdAt         DateTime    @default(now())
+  fitResults        FitResult[]
+}
+
+model FitResult {
+  id           String   @id @default(cuid())
+  bikeType     String
+  height       Float
+  inseam       Float
+  saddleHeight String
+  date         DateTime @default(now())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
