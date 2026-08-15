@@ -3,14 +3,34 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import Navbar from '@/components/Navbar';
 import BikeFitForm from '@/components/BikeFitForm';
+import RedirectWithCountdown from '@/components/RedirectWithCountdown'; // Aşağıda oluşturacağımız istemci bileşeni
 
 export default async function BikeFitYapPage() {
   // 1. Çerezlerden kullanıcı ID'sini alıyoruz
   const cookieStore = await cookies();
   const userId = cookieStore.get('userId')?.value;
 
+  // Kullanıcı yoksa veya giriş yapmamışsa direkt 5 saniye sayaçlı yönlendirme ekranını gösterelim
   if (!userId) {
-    redirect('/login');
+    return (
+      <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center p-4">
+          <div className="bg-slate-900 p-8 rounded-2xl border border-slate-800 max-w-md w-full text-center space-y-4 shadow-xl">
+            <div className="w-12 h-12 bg-amber-500/10 text-amber-400 rounded-full flex items-center justify-center mx-auto text-xl font-bold">
+              ⚠️
+            </div>
+            <h1 className="text-xl font-bold text-white">Giriş Yapılması Gerekiyor</h1>
+            <p className="text-sm text-slate-400">
+              Bike fit hesabı yapabilmek için üye olmanız veya giriş yapmanız gerekmektedir. Giriş sayfasına yönlendiriliyorsunuz...
+            </p>
+            
+            {/* 5 Saniye Geri Sayım ve Otomatik Yönlendirme Bileşeni */}
+            <RedirectWithCountdown targetUrl="/login" />
+          </div>
+        </div>
+      </main>
+    );
   }
 
   // 2. Veritabanından kullanıcının e-posta doğrulama durumunu kontrol ediyoruz
