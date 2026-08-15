@@ -30,6 +30,6 @@ export default function Home() {
           Hemen Bike Fit Analizine Başla
         </Link>
       </div>
-    </main>.
+    </main>
   );
 }
