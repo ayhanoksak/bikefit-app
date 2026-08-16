@@ -1,7 +1,7 @@
 // app/api/auth/login/route.ts
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { cookies } from 'next/headers'; // Çerezleri yönetmek için ekledik
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
@@ -19,14 +19,15 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Geçersiz e-posta veya şifre.' }, { status: 401 });
     }
 
-    // ÇEREZİ AYARLIYORUZ (Sistem artık seni tanıyacak!)
-    const cookieStore = await cookies();
-    cookieStore.set('userId', user.id, {
+    // Çerezi doğrudan set ediyoruz (Next.js 14 uyumlu)
+    cookies().set({
+      name: 'userId',
+      value: user.id,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 1 hafta boyunca hatırlasın
+      maxAge: 60 * 60 * 24 * 7, // 1 hafta
     });
 
     return NextResponse.json({
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
       email: user.email,
     });
   } catch (error) {
-    console.error(error);
+    console.error('Login Error:', error);
     return NextResponse.json({ success: false, error: 'Sunucu hatası oluştu.' }, { status: 500 });
   }
 }
