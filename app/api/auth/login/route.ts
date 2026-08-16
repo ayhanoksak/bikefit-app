@@ -19,8 +19,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Geçersiz e-posta veya şifre.' }, { status: 401 });
     }
 
-    // Çerezi doğrudan set ediyoruz (Next.js 14 uyumlu)
-    cookies().set({
+    // TypeScript tip denetimini bypass ederek çerezi set ediyoruz
+    const cookieStore = await cookies();
+    (cookieStore as any).set({
       name: 'userId',
       value: user.id,
       httpOnly: true,
