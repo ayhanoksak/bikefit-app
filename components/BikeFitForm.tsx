@@ -7,7 +7,6 @@ export default function BikeFitForm() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   
-  // API route'unun (fit-hesapla) beklediği değişken isimleriyle birebir uyumlu hale getirildi
   const [data, setData] = useState({
     height: '',
     inseam: '',
@@ -29,14 +28,25 @@ export default function BikeFitForm() {
     setLoading(true);
     setResult(null);
     
+    // Tarayıcı hafızasından userId'yi alıyoruz
+    const userId = localStorage.getItem('userId');
+
+    if (!userId) {
+      alert('Oturum bilgisi bulunamadı. Lütfen tekrar giriş yapın.');
+      window.location.href = '/login';
+      return;
+    }
+
     console.log("-> [FRONTEND] İSTEK BAŞLATILDI. Gönderilen Veri:", data);
 
     try {
       const res = await fetch('/api/fit-hesapla', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'x-user-id': userId // <-- Kimlik bilgisini güvenle header ile iletiyoruz
+        },
         body: JSON.stringify(data),
-        credentials: 'include', // <--- Çerezin sunucuya gitmesini sağlayan kritik parametre!
       });
 
       console.log("-> [FRONTEND] SUNUCU YANIT KODU (STATUS):", res.status);
@@ -49,6 +59,9 @@ export default function BikeFitForm() {
       } else {
         setResult(null);
         alert(`Hata (${res.status}): ` + (resData.error || 'İşlem başarısız. Lütfen tekrar giriş yapın.'));
+        if (res.status === 401) {
+          window.location.href = '/login';
+        }
       }
     } catch (err: any) {
       console.error("-> [FRONTEND] BAĞLANTI HATASI:", err);
@@ -144,7 +157,7 @@ export default function BikeFitForm() {
       </form>
 
       {/* Hesaplama Sonuç Alanı */}
-        {result && (
+      {result && (
         <div className="mt-8 border-t border-slate-800 pt-6 space-y-4">
           <h2 className="text-lg font-bold text-white">Ölçüm Sonuçlarınız</h2>
           <div className="grid grid-cols-2 gap-4 text-sm">
