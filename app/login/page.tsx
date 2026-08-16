@@ -2,13 +2,11 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,17 +22,14 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (data.success) {
-        // Oturum verilerini localStorage'a kaydediyoruz (Navbar'ın uyumlu okuması için)
+        // Oturum verilerini localStorage'a kaydediyoruz
         localStorage.setItem('userId', data.userId);
-        
-        // Kullanıcı adını da kaydedelim ki sağ üstte harfi/ismi görünsün
         const nameToSave = data.name || data.userName || email.split('@')[0];
         localStorage.setItem('user', JSON.stringify({ name: nameToSave, id: data.userId }));
 
-        // Navbar'ın değişikliği anında fark etmesi için event tetikliyoruz
-        window.dispatchEvent(new Event('storage'));
-
-        router.push('/bikefit-yap');
+        // Çerezin tarayıcıya işlenmesi ve sunucunun oturumu tanıması için 
+        // sayfayı tam yenileme (hard reload) ile yönlendiriyoruz:
+        window.location.href = '/bikefit-yap';
       } else {
         setError(data.error || 'Giriş başarısız.');
       }
