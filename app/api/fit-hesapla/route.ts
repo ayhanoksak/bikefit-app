@@ -15,12 +15,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: 'Yetkisiz erişim: Lütfen giriş yapın.' }, { status: 401 });
   }
 
-  // BURADAKİ HATA DÜZELTİLDİ: await eklendi
+  // Kullanıcının veritabanında var olup olmadığını kontrol ediyoruz (isVerified şartı kaldırıldı)
   const user = await prisma.user.findUnique({ where: { id: userId } });
   
-  if (!user || !user.isVerified) {
-    console.log("HATA: Kullanıcı bulunamadı veya doğrulanmamış, 403 dönülüyor.");
-    return NextResponse.json({ success: false, error: 'Hesabınız henüz doğrulanmamış.' }, { status: 403 });
+  if (!user) {
+    console.log("HATA: Kullanıcı bulunamadı, 401 dönülüyor.");
+    return NextResponse.json({ success: false, error: 'Kullanıcı bulunamadı.' }, { status: 401 });
   }
 
   console.log("BAŞARILI: Kullanıcı doğrulandı, hesaplama yapılıyor.");
