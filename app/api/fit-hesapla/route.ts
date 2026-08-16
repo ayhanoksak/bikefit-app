@@ -1,21 +1,19 @@
 // app/api/fit-hesapla/route.ts
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(request: Request) {
-  const cookieStore = await cookies();
-  const userId = cookieStore.get('userId')?.value;
+  // Çerez yerine frontend'den header ile gönderilen userId'yi alıyoruz
+  const userId = request.headers.get('x-user-id');
 
   console.log("--- BIKETIT API ÇAĞRILDI ---");
-  console.log("Okunan userId değeri:", userId);
+  console.log("Header üzerinden okunan userId değeri:", userId);
 
   if (!userId) {
     console.log("HATA: userId bulunamadı, 401 dönülüyor.");
     return NextResponse.json({ success: false, error: 'Yetkisiz erişim: Lütfen giriş yapın.' }, { status: 401 });
   }
 
-  // Kullanıcının veritabanında var olup olmadığını kontrol ediyoruz (isVerified şartı kaldırıldı)
   const user = await prisma.user.findUnique({ where: { id: userId } });
   
   if (!user) {
